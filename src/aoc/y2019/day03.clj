@@ -1,4 +1,6 @@
-(def input (clojure.string/split-lines (slurp "input")))
+(ns aoc.y2019.day03)
+
+(defn input->data [input] (clojure.string/split-lines input))
 
 (defn parse-wire-path [wire-path]
   (map (fn [step-str]
@@ -26,34 +28,39 @@
    [0 0]
    wire-vecs))
 
-(def wire-paths (map parse-wire-path input))
-
-(def wires 
-  (->> wire-paths
+(defn wires [input]
+  (->> (map parse-wire-path input)
        (map wire-vecs)
        (map wire-coords)))
 
-(def intersection-points
+(defn intersection-points [wires]
   (->> wires
        (map #(into #{} %))
        (apply clojure.set/intersection)
        (remove #(= [0 0] %))))
 
-;; Solution 1
-(->> intersection-points
-     (sort-by (fn [coords] (reduce + (map #(Math/abs %) coords))))
-     (first)
-     (map #(Math/abs %))
-     (reduce +))
+(defn solve-1
+  ([] (solve-1 (slurp "input/2019day03")))
+  ([input]
+   (->> (input->data input)
+        wires
+        intersection-points
+        (sort-by (fn [coords] (reduce + (map #(Math/abs %) coords))))
+        (first)
+        (map #(Math/abs %))
+        (reduce +))))
 
-(defn combined-path-to-point [point]
+(defn combined-path-to-point [wires point]
   (->> wires
        (map (partial vec))
        (map #(.indexOf % point))
        (reduce +)))
 
-;; Solution 2
-(->> intersection-points
-     (map combined-path-to-point)
-     sort
-     first)
+(defn solve-2
+  ([] (solve-2 (slurp "input/2019day03")))
+  ([input]
+   (let [wires (wires (input->data input))]
+     (->> (intersection-points wires)
+          (map (partial combined-path-to-point wires))
+          sort
+          first))))

@@ -1,3 +1,5 @@
+(ns aoc.y2019.day09)
+
 ;; Intcode computer
 (defn resolve-param [program relative-base param-mode param]
   (case (Integer/parseInt (str param-mode))
@@ -92,20 +94,20 @@
         (swap! input-atom rest)
         this-input))))
 
-;; Day 9 program
-(def day9-input
+(defn input->data [input]
   (mapv #(Integer/parseInt %)
-        (-> (slurp "input")
+        (-> input
             clojure.string/trim
             (clojure.string/split #","))))
 
-(comment
-  (compute [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]) ;; itself in output
-  (compute [104,1125899906842624,99]) ;; output middle number
-  (compute [1102,34915192,34915192,7,4,7,99,0]) ;; 16-digit number
- ) 
+(defn solve-1
+  ([] (solve-1 (slurp "input/2019day09")))
+  ([input] 
+   (let [program (input->data input)]
+     (:result (compute program (non-interactive-input-factory [1]))))))
 
-;; Day 9 Solution part 1
-(compute day9-input (non-interactive-input-factory [1]))
-;; Part 2
-(compute day9-input (non-interactive-input-factory [2]))
+(defn solve-2
+  ([] (solve-2 (slurp "input/2019day09")))
+  ([input] 
+   (let [program (input->data input)]
+     (:result (compute program (non-interactive-input-factory [2]))))))

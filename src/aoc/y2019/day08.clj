@@ -1,1 +1,2 @@
-(def input (slurp "input"))
+(ns aoc.y2019.day08)
+

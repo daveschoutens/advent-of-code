@@ -1,3 +1,5 @@
+(ns aoc.y2019.day07)
+
 ;; Intcode computer
 (defn resolve-param [program param-mode param]
   (let [mode (case (Integer/parseInt (str param-mode))
@@ -90,10 +92,9 @@
     {:out (fn [] (.take q))
      :in (fn [out] (.put q out))}))
 
-;; Day 7 program
-(def day7-input
+(defn input->data [input]
   (mapv #(Integer/parseInt %)
-        (-> (slurp "input")
+        (-> input
             clojure.string/trim
             (clojure.string/split #","))))
 
@@ -119,17 +120,16 @@
           tail (permutations (disj (set colls) head))]
       (cons head tail))))
 
-;; Solution part 1
-(->> (permutations (range 0 5))
-     (map #(amp-chain-compute day7-input 0 %))
-     (apply max))
+(defn solve-1
+  ([] (solve-1 (slurp "input/2019day07")))
+  ([input]
+   (->> (permutations (range 0 5))
+        (map #(amp-chain-compute (input->data input) 0 %))
+        (apply max))))
 
-;; Solution part 2
-(->> (permutations (range 5 10))
-     (map #(amp-chain-compute day7-input 0 %))
-     (apply max))
-
-(comment
-  (compute [3,0,4,0,99] interactive-input-fn)
-  (compute [3,0,4,0,99] (non-interactive-input-factory [1]))
-  (:return (compute day7-input interactive-input-fn)))
+(defn solve-2
+  ([] (solve-2 (slurp "input/2019day07")))
+  ([input]
+   (->> (permutations (range 5 10))
+        (map #(amp-chain-compute (input->data input) 0 %))
+        (apply max))))

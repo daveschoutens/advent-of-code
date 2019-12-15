@@ -1,4 +1,6 @@
-(def input (map #(Integer/parseInt %) (clojure.string/split (slurp "input") #"\n")))
+(ns aoc.y2019.day01)
+
+(defn input->data [input] (map #(Integer/parseInt %) (clojure.string/split-lines input)))
 
 (defn fuel-needed [mass]
   (- (Math/floorDiv mass 3) 2))
@@ -9,8 +11,9 @@
 (defn sum-all [func xs]
   (reduce + (map func xs)))
 
-;; Solution 1
-(sum-all fuel-needed input)
+(defn solve-1
+  ([] (solve-1 (slurp "input/2019day01")))
+  ([input] (sum-all fuel-needed (input->data input))))
 
 (defn accurate-fuel-needed [mass]
   (let [fuel-for-mass (fuel-needed mass)
@@ -20,14 +23,6 @@
       (neg? fuel-for-fuel) fuel-for-mass
       :else (+ fuel-for-mass fuel-for-fuel (accurate-fuel-needed fuel-for-fuel)))))
 
-;; Solution 2
-(sum-all accurate-fuel-needed input)
-
-;; Supporting tests
-
-(defn assert-equals [expected actual]
-  (assert (= expected actual) (str "Expected " expected " but got " actual)))
-
-(assert-equals 2 (accurate-fuel-needed 14))
-(assert-equals 966 (accurate-fuel-needed 1969))
-(assert-equals 50346 (accurate-fuel-needed 100756))
+(defn solve-2
+  ([] (solve-2 (slurp "input/2019day01")))
+  ([input] (sum-all accurate-fuel-needed (input->data input))))

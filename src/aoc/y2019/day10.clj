@@ -1,4 +1,6 @@
-(def input (clojure.string/split-lines (slurp "input")))
+(ns aoc.y2019.day10)
+
+(def input->data clojure.string/split-lines)
 
 (defn asteroids-from-input [input]
   (for [y (range 0 (count input))
@@ -9,18 +11,19 @@
 
 (defn p->q [[x1 y1] [x2 y2]] [(- x2 x1) (- y2 y1)])
 
-(defn magnitude [[x y]]
-  (.sqrt (bigdec (+ (* x x) (* y y))) java.math.MathContext/DECIMAL128))
+(defn dot [v1 v2]
+  (apply + (map (partial apply *) (partition 2 (interleave v1 v2)))))
+
+(defn cross2d [[x1 y1] [x2 y2]]
+  (- (* x1 y2) (* x2 y1)))
+
+(defn magnitude [v]
+  "Calculates the magnitude of a 2d vector. NOTE: REQUIRES JDK 9+"
+  (.sqrt (bigdec (dot v v)) java.math.MathContext/DECIMAL128))
 
 (defn unit-vector [[x y :as v]]
   (let [mag (magnitude v)]
     [(with-precision 32 (/ x mag)) (with-precision 32 (/ y mag))]))
-
-(defn dot [v1 v2]
-  (reduce + (map (partial apply *) (partition 2 (interleave v1 v2)))))
-
-(defn cross2d [[x1 y1] [x2 y2]]
-  (- (* x1 y2) (* x2 y1)))
 
 (defn vec-angle [v1 v2]
   (let [theta (Math/acos (dot (unit-vector v1) (unit-vector v2)))
@@ -67,11 +70,14 @@
                            (if (empty? remaining-groups)
                              lase-order
                              (recur (into lase-order (filter some? (map first remaining-groups)))
-                                    (filter not-empty (map rest remaining-groups)))))]
-    (nth sorted-asteroids 199)))
+                                    (filter not-empty (map rest remaining-groups)))))
+        [x y] (:asteroid (nth sorted-asteroids 199))]
+    (+ (* 100 x) y)))
 
-;; Solution 1
-(solution1 (slurp "input"))
+(defn solve-1
+  ([] (solve-1 (slurp "input/2019day10")))
+  ([input] (solution1 input)))
 
-;; Solution 2
-(solution2 (slurp "input"))
+(defn solve-2
+  ([] (solve-2 (slurp "input/2019day10")))
+  ([input] (solution2 input)))

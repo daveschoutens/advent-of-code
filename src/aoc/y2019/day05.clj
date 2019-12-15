@@ -1,4 +1,7 @@
-(def initial-input (mapv clojure.edn/read-string (clojure.string/split (slurp "input") #",")))
+(ns aoc.y2019.day05)
+
+(defn input->data [input]
+  (mapv #(Integer/parseInt %) (clojure.string/split (clojure.string/trim input) #",")))
 
 (defn interpret-instruction [program opcode & params]
   (let [[param-3-mode param-2-mode param-1-mode & op-chars :as opv] (format "%05d" opcode)
@@ -29,13 +32,19 @@
   (loop [prog program pctr 0 output []]
     (let [[op p1 p2 p3] (drop pctr prog)
           {:keys [op p1 p2 p3]} (interpret-instruction program op p1 p2 p3)]
-      (case (instruction :op)
-        :add (recur (assoc prog p3 (+ a b)) (+ 4 pctr) output)
-        :mult (recur (assoc prog p3 (* a b)) (+ 4 pctr) output)
-        :input (recur (assoc prog p1 (Integer/parseInt (read-line))) (+ 2 pctr) output)
-        :output (recur prog (+ 2 pctr) (conj output (get prog p1)))
-        :halt {:program prog
-               :output output
-               :return (last output)}))))
+      (case op
+       :add (recur (assoc prog p3 (+ p1 p2)) (+ 4 pctr) output)
+       :mult (recur (assoc prog p3 (* p1 p2)) (+ 4 pctr) output)
+       :input (recur (assoc prog p1 (Integer/parseInt (read-line))) (+ 2 pctr) output)
+       :output (recur prog (+ 2 pctr) (conj output (get prog p1)))
+       :halt {:program prog
+              :output output
+              :return (last output)}))))
 
-(exec [3,0,4,0,99])
+;; TODO: eliminate use of input prompts to enable this to run automatically
+;; TODO: Broken?
+(defn solve-1
+  ([] (solve-1 (slurp "input/2019day05")))
+  ([input] (exec (input->data input))))
+
+(defn solve-2 [& args] (apply solve-1 args))
