@@ -1,5 +1,6 @@
-(defn read-input []
-  (clojure.string/split (slurp "input") #"\n"))
+(ns aoc.y2018.day02)
+
+(defn input->data [input] (clojure.string/split input #"\n"))
 
 (defn pairs-and-triples [box-id]
   (let [freqs (vals (frequencies box-id))
@@ -11,13 +12,11 @@
   (let [pts (->> box-ids (map pairs-and-triples))
         all-pairs (->> pts (map first) (remove nil?) count)
         all-triples (->> pts (map second) (remove nil?) count)]
-    (do
-      (print all-pairs)
-      (print all-triples)
-      (* all-pairs all-triples))))
+    (* all-pairs all-triples)))
 
-;; Solution one
-(checksum (read-input))
+(defn solve-1
+  ([] (solve-1 (slurp "input/2018day02")))
+  ([input] (checksum (input->data input))))
 
 (defn remove-indexed [i coll]
   (concat (take i coll) (nthrest coll (inc i))))
@@ -33,5 +32,9 @@
         :when (> freq 1)]
     id))
 
-;; Solution two
-(first (mapcat #(find-duplicate (remove-indexed-char-from-all (read-input) %)) (range)))
+(defn solve-2 
+  ([] (solve-2 (slurp "input/2018day02")))
+  ([input] 
+   (first (mapcat 
+           #(find-duplicate (remove-indexed-char-from-all (input->data input) %))
+           (range)))))

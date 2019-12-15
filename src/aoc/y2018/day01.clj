@@ -1,10 +1,10 @@
-(defn one []
-  (reduce + (map #(Integer/parseInt %) 
-                 (clojure.string/split (slurp "input") #"\n"))))
+(ns aoc.y2018.day01)
 
-(defn infinite-rolling-sum []
-  (reductions + (cycle (map #(Integer/parseInt %) 
-                            (clojure.string/split (slurp "input") #"\n")))))
+(defn input->data [input] 
+  (map #(Integer/parseInt %) (clojure.string/split input #"\n")))
+
+(defn infinite-rolling-sum [ints]
+  (reductions + (cycle ints)))
 
 (defn find-repeated [s]
   (loop [s s
@@ -14,5 +14,10 @@
         x
         (recur (rest s) (conj xs x))))))
 
-(defn two []
-  (find-repeated (infinite-rolling-sum)))
+(defn solve-1
+  ([] (solve-1 (slurp "input/2018day01")))
+  ([input] (reduce + (input->data input))))
+
+(defn solve-2 
+  ([] (solve-2 (slurp "input/2018day01")))
+  ([input] (find-repeated (infinite-rolling-sum (input->data input)))))
