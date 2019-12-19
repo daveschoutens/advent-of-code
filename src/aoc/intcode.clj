@@ -1,7 +1,9 @@
-(ns aoc.y2019.intcode)
+(ns aoc.y2019.intcode
+  (:require [aoc.util :as util]
+            [clojure.string :as str]))
 
 (defn resolve-param [program relative-base param-mode param]
-  (case (Integer/parseInt (str param-mode))
+  (case (util/parse-int(str param-mode))
     0 {:mode :position
        :read (or (get program param) 0)
        :write param}
@@ -35,18 +37,15 @@
         program (if (> diff 0) (into program (repeat diff 0)) program)]
     (assoc program addr value)))
 
-(defn parse-program [input]
-  (mapv #(Long/parseLong %)
-        (-> input
-            clojure.string/trim
-            (clojure.string/split #","))))
+(defn parse-program [input] 
+  (mapv util/parse-long (str/split (str/trim-newline input) #",")))
 
 (defn compute
   ([program] (compute program (fn [])))
   ([program input-fn] (compute program input-fn (fn [_])))
   ([program input-fn output-fn]
    (loop [{:keys [program pctr relative-base output] :as state}
-          {:program (parse-program program) :pctr 0 :relative-base 0 :output []}]
+          {:program program :pctr 0 :relative-base 0 :output []}]
      (let [{:keys [op p1 p2 p3] :as instr} (interpret-instruction program pctr relative-base)]
        (case op
          :add
