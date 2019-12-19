@@ -39,7 +39,7 @@
                             :robot-command-state :move})
         program-input (fn [] (if (= :white (read-current-panel-color @$world-state)) 1 0))
         program-output (robot-command-issuer $world-state)]
-    (intcode/compute program program-input program-output)
+    (intcode/compute (intcode/parse-program program) program-input program-output)
     @$world-state))
 
 (defn solve-1
@@ -61,8 +61,8 @@
          image-width (- max-x min-x)]
      (doseq [row (map (partial apply str)
                        (partition image-width
-                                  (for [x (range min-x max-x)
-                                        y (range min-y max-y)
+                                  (for [y (reverse (range min-y max-y))
+                                        x (range min-x max-x)
                                         :let [color (or (get panels [x y]) :black)]]
                                     (if (= color :white) "#" " "))))]
        (println row)))))
