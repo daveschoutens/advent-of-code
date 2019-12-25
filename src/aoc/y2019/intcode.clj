@@ -57,14 +57,19 @@
                        :program (write-value program (:write p3) (* (:read p1) (:read p2)))
                        :pctr (+ 4 pctr)))
          :input
-         (recur (assoc state
-                       :program (write-value program (:write p1) (input-fn))
-                       :pctr (+ 2 pctr)))
+         #_(recur (assoc state
+                         :program (write-value program (:write p1) (input-fn))
+                         :pctr (+ 2 pctr)))
+         (if-let [input (input-fn)]
+           (recur (assoc state
+                         :program (write-value program (:write p1) input)
+                         :pctr (+ 2 pctr)))
+           {:program program :status :aborted})
          :output
          (do (output-fn (:read p1))
              (recur (assoc state
                            :pctr (+ 2 pctr)
-                           :output (conj output (:read p1)))))
+                           #_#_:output (conj output (:read p1)))))
          :jump-if-true
          (recur (assoc state
                        :program program
