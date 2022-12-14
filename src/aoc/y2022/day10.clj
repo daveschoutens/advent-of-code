@@ -2,19 +2,16 @@
 
 (defn execute [program]
   (->>
-   (reductions
-    (fn [state instruction]
-      (let [[_ inst param] (re-matches #"(\w+) ?(.*)?" instruction)]
+   (reduce
+    (fn [timestate instruction]
+      (let [state (last timestate)
+            [_ inst param] (re-matches #"(\w+) ?(.*)?" instruction)]
         (case inst
-          "noop" (update state :clock inc)
-          "addx" (-> state
-                     (update :x + (parse-long param))
-                     (update :clock + 2)))))
-    {:x 1 :clock 0}
+          "noop" (conj timestate state)
+          "addx" (conj timestate state (+ state (parse-long param))))))
+    [1]
     program)
-   (partition-all 2 1)
-   (mapcat (fn [[a b]] (repeat (if b (- (:clock b) (:clock a)) 1) a)))
-   (map-indexed #(assoc %2 :clock (inc %1)))))
+   (map-indexed #(hash-map :x %2 :clock (inc %1)))))
 
 (defn signal-strength [dump]
   (->> dump
